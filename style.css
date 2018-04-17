@@ -1,0 +1,12 @@
+h4 {color:white;}
+
+#canvas{
+	position:absolute;
+	top:0px;
+	left:0px;
+}
+
+body {
+ 	background-color:#000;
+ 	overflow:hidden;
+}
