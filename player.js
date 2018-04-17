@@ -1,5 +1,4 @@
-var canvas = null;
-var context = null;
+var canvas = null, context = null;
 
 // web audio globals
 var auContext, oscillator, gainNode;
@@ -50,7 +49,7 @@ function draw() {
 }
 
 function animate() {
-    requestAnimationFrame(animate); // ~60fps
+    requestAnimationFrame(animate);
 	
 	if (!running) {return;}
 	
@@ -61,22 +60,22 @@ function animate() {
     
     // bounce circle off wall!
     var freq = -1; // this will be the frequency per each wall
-    if (shape.x > (dim.w-0.5*(shape.r+0.5*strokewidth))) { 		// right wall
+    if (shape.x > (dim.w-0.5*(shape.r+0.5*strokewidth))) { 	// right wall
     	shape.x = dim.w-0.5*(shape.r+0.5*strokewidth);
     	fct.x *= -1; 
     	freq = 550;
     } 
-    if (shape.y > (dim.h-0.5*(shape.r+0.5*strokewidth))) {		// bottom wall
+    if (shape.y > (dim.h-0.5*(shape.r+0.5*strokewidth))) {	// bottom wall
     	shape.y = dim.h-0.5*(shape.r+0.5*strokewidth);
     	fct.y *= -1; 
     	freq = 220;
     } 
-    if (shape.x < 0.5*(shape.r+0.5*strokewidth)) {				// left wall
+    if (shape.x < 0.5*(shape.r+0.5*strokewidth)) {	// left wall
     	shape.x = 0.5*(shape.r+0.5*strokewidth);
     	fct.x *= -1; 
     	freq = 440;
     }
-    if (shape.y < 0.5*(shape.r+0.5*strokewidth)) {				// top wall
+    if (shape.y < 0.5*(shape.r+0.5*strokewidth)) {	// top wall
     	shape.y = 0.5*(shape.r+0.5*strokewidth);
     	fct.y *= -1; 
     	freq = 770;
@@ -132,7 +131,7 @@ function doKeyDown(e) {
 	
 	e.preventDefault; // no need to trigger slideshow when embedded
 	
-	if ( e.keyCode == 32 ) {  // q
+	if ( e.keyCode == 32 ) {  // space bar
 		if (needsAnimate) { animate(); needsAnimate = false;} 
 		running = !running; // toggle
 	}
