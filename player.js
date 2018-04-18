@@ -1,7 +1,8 @@
-var canvas = null, context = null;
+var canvas = null;
+var context = null;
 
 // web audio globals
-var auContext, oscillator, gainNode;
+var auContext = null, oscillator, gainNode;
 
 // UI flags
 var running = false;
@@ -19,7 +20,7 @@ function playOsc(freq) {
 		oscillator.frequency.setValueAtTime(freq,currentTime);
 		
 		oscillator.connect(gainNode);
-		
+
 		oscillator.start(currentTime);
 		oscillator.stop(currentTime + 0.25); // quarter second
 }
@@ -43,97 +44,108 @@ function draw() {
 	
 	// draw the circle
 	context.beginPath();
-	context.fillStyle = '#00aaff';
-	context.arc(shape.x*dim.ratio, shape.y*dim.ratio, 0.5*shape.r*dim.ratio, 0, 2*Math.PI, true);
-	context.fill();
+    context.fillStyle = '#00aaff';
+    context.arc(shape.x*dim.ratio, shape.y*dim.ratio, 0.5*shape.r*dim.ratio, 0, 2*Math.PI, true);
+    context.fill();
 }
 
 function animate() {
-	requestAnimationFrame(animate);
-
-	if (!running) {return;}
-
-	shape.x += 3*fct.x*dim.ratio;
-	shape.y += 3*fct.y*dim.ratio;
-
-	draw(); // draw and move things (afterward)
-
-	// bounce circle off wall!
-	var freq = -1; // this will be the frequency per each wall
-	if (shape.x > (dim.w-0.5*(shape.r+0.5*strokewidth))) { 	// right wall
-		shape.x = dim.w-0.5*(shape.r+0.5*strokewidth);
-		fct.x *= -1; 
-		freq = 550;
-	} 
-	if (shape.y > (dim.h-0.5*(shape.r+0.5*strokewidth))) {	// bottom wall
-		shape.y = dim.h-0.5*(shape.r+0.5*strokewidth);
-		fct.y *= -1; 
-		freq = 220;
-	} 
-	if (shape.x < 0.5*(shape.r+0.5*strokewidth)) {	// left wall
-		shape.x = 0.5*(shape.r+0.5*strokewidth);
-		fct.x *= -1; 
-		freq = 440;
-	}
-	if (shape.y < 0.5*(shape.r+0.5*strokewidth)) {	// top wall
-		shape.y = 0.5*(shape.r+0.5*strokewidth);
-		fct.y *= -1; 
-		freq = 770;
-	}
+    requestAnimationFrame(animate); // ~60fps
 	
-	// play audio when it bounces
-	if (freq != -1) { playOsc(freq); }
+	if (!running) {return;}
+	
+    shape.x += 3*fct.x*dim.ratio;
+    shape.y += 3*fct.y*dim.ratio;
+	
+    draw(); // draw and move things (afterward)
+    
+    // bounce circle off wall!
+    var freq = -1; // this will be the frequency per each wall
+    if (shape.x > (dim.w-0.5*(shape.r+0.5*strokewidth))) { 		// right wall
+    	shape.x = dim.w-0.5*(shape.r+0.5*strokewidth);
+    	fct.x *= -1; 
+    	freq = 550;
+    } 
+    if (shape.y > (dim.h-0.5*(shape.r+0.5*strokewidth))) {		// bottom wall
+    	shape.y = dim.h-0.5*(shape.r+0.5*strokewidth);
+    	fct.y *= -1; 
+    	freq = 220;
+    } 
+    if (shape.x < 0.5*(shape.r+0.5*strokewidth)) {				// left wall
+    	shape.x = 0.5*(shape.r+0.5*strokewidth);
+    	fct.x *= -1; 
+    	freq = 440;
+    }
+    if (shape.y < 0.5*(shape.r+0.5*strokewidth)) {				// top wall
+    	shape.y = 0.5*(shape.r+0.5*strokewidth);
+    	fct.y *= -1; 
+    	freq = 770;
+    }
+    
+    // play audio when it bounces
+    if (freq != -1) { playOsc(freq); }
 }
 
 function resize() {
-	var devicePixelRatio = window.devicePixelRatio || 1;
-	var backingStoreRatio = canvas.webkitBackingStorePixelRatio ||
-		canvas.mozBackingStorePixelRatio ||
-		canvas.msBackingStorePixelRatio ||
-		canvas.oBackingStorePixelRatio ||
-		canvas.backingStorePixelRatio || 1;
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio = canvas.webkitBackingStorePixelRatio ||
+        canvas.mozBackingStorePixelRatio ||
+        canvas.msBackingStorePixelRatio ||
+        canvas.oBackingStorePixelRatio ||
+        canvas.backingStorePixelRatio || 1;
 
-	dim.ratio = devicePixelRatio / backingStoreRatio;
-	dim.w = window.innerWidth;
-	dim.h = window.innerHeight;
+    dim.ratio = devicePixelRatio / backingStoreRatio;
+    dim.w = window.innerWidth;
+    dim.h = window.innerHeight;
 
-	canvas.width =  dim.w*dim.ratio;
-	canvas.height =  dim.h*dim.ratio;
-	canvas.style.width = dim.w + 'px';
-	canvas.style.height = dim.h + 'px';
+    canvas.width =  dim.w*dim.ratio;
+    canvas.height =  dim.h*dim.ratio;
+    canvas.style.width = dim.w + 'px';
+    canvas.style.height = dim.h + 'px';
 }
 
 window.onload = function() {
-	canvas = document.getElementById("canvas");
-	context = canvas.getContext('2d');
+    canvas = document.getElementById("canvas");
+    context = canvas.getContext('2d');
 	
-	// Use audioContext from webaudio_tools.js
-	auContext = new (window.AudioContext || window.webkitAudioContext)();
-	
-	gainNode = auContext.createGain(); // for when not connected to panner
-	gainNode.gain.setValueAtTime(0.4, auContext.currentTime);
-	
-	gainNode.connect(auContext.destination);
-	
+	// Initialize audioContext
+    auContext = new (window.AudioContext || window.webkitAudioContext)(); // normal
+   	
+   	gainNode = auContext.createGain(); // for when not connected to panner
+   	gainNode.gain.setValueAtTime(0.4, auContext.currentTime);
+   	
+   	gainNode.connect(auContext.destination);
+
 	resize();
 	
 	// after resize: set circle
 	shape.x = 0.5*dim.w;
 	shape.y = 0.5*dim.h;
 	draw();
-	
-	window.addEventListener( "keypress", doKeyDown, false );
+    
+    window.addEventListener("keypress", doKeyDown, false);
+    window.addEventListener("touchstart", touchdown, false);
 }
 window.onresize = resize;
+
+function togglerunning() {
+	if (needsAnimate) { animate(); needsAnimate = false;} 
+	running = !running; // toggle
+}
+
+function touchdown(e) {
+	e.preventDefault();
+	if (auContext.state === 'suspended') {auContext.resume();} // for mobile safari
+	togglerunning();
+}
 
 function doKeyDown(e) {
 	//alert( e.keyCode );
 	
 	e.preventDefault; // no need to trigger slideshow when embedded
 	
-	if ( e.keyCode == 32 ) {  // space bar
-		if (needsAnimate) { animate(); needsAnimate = false;} 
-		running = !running; // toggle
+	if ( e.keyCode == 32 ) {  // q
+		togglerunning();
 	}
 	if ( e.keyCode == 100 ) {  // d
 		animate(); // because crazy
