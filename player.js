@@ -125,6 +125,7 @@ window.onload = function() {
     
     window.addEventListener("keypress", doKeyDown, false);
     window.addEventListener("touchstart", touchdown, false);
+    window.addEventListener("mousedown", touchdown, false);
 }
 window.onresize = resize;
 
