@@ -1,22 +1,25 @@
-var canvas = null;
-var context = null;
+let canvas = null;
+let context = null;
 
 // web audio globals
-var auContext = null, oscillator, gainNode;
+let auContext = null, oscillator, gainNode;
 
 // UI flags
-var running = false;
-var needsAnimate = true;
+let running = false;
+let needsAnimate = true;
 
-var dim = {}, 
-	shape = {"x":0,"y":0,"r":56}, 
-	fct = {"x":Math.random() < 0.5 ? -1 : 1,"y":Math.random() < 0.5 ? -1 : 1},
+let dim = {}, 
+	shape = {x:0,y:0,r:56}, 
+	fct = {
+		x:Math.random() < 0.5 ? -1 : 1,
+		y:Math.random() < 0.5 ? -1 : 1
+	},
 	strokewidth = 20;
 
 function playOsc(freq) {
-	var currentTime = auContext.currentTime;
-	var oscillator = auContext.createOscillator();
-		oscillator.type = 'sine';
+	let currentTime = auContext.currentTime;
+	let oscillator = auContext.createOscillator();
+		oscillator.type = "sine";
 		oscillator.frequency.setValueAtTime(freq,currentTime);
 		
 		oscillator.connect(gainNode);
@@ -28,24 +31,24 @@ function playOsc(freq) {
 function draw() {
 	// clear the frame
 	context.globalAlpha = 0.1;
-	context.fillStyle = '#000';
-	context.fillRect(0,0,dim.w*dim.ratio,dim.h*dim.ratio);
+	context.fillStyle = "#000000";
+	context.fillRect(0,0,dim.w,dim.h);
 	
 	// reset alpha back to 1
 	context.globalAlpha = 1;
 	
 	// draw the border
 	context.beginPath();
-	context.rect(0,0,dim.w*dim.ratio,dim.h*dim.ratio);
-	context.strokeStyle = '#fff';
+	context.rect(0,0,dim.w,dim.h);
+	context.strokeStyle = "#ffffff";
 	context.lineWidth = strokewidth;
 	context.stroke();
 	context.closePath();
 	
 	// draw the circle
 	context.beginPath();
-    context.fillStyle = '#00aaff';
-    context.arc(shape.x*dim.ratio, shape.y*dim.ratio, 0.5*shape.r*dim.ratio, 0, 2*Math.PI, true);
+    context.fillStyle = "#00aaff";
+    context.arc(shape.x, shape.y, 0.5*shape.r, 0, 2*Math.PI, true);
     context.fill();
 }
 
@@ -54,8 +57,8 @@ function animate() {
 	
 	if (!running) {return;}
 	
-    shape.x += 3*fct.x*dim.ratio;
-    shape.y += 3*fct.y*dim.ratio;
+    shape.x += 3*fct.x;
+    shape.y += 3*fct.y;
 	
     draw(); // draw and move things (afterward)
     
@@ -87,25 +90,22 @@ function animate() {
 }
 
 function resize() {
-    var devicePixelRatio = window.devicePixelRatio || 1;
-    var backingStoreRatio = canvas.webkitBackingStorePixelRatio ||
-        canvas.mozBackingStorePixelRatio ||
-        canvas.msBackingStorePixelRatio ||
-        canvas.oBackingStorePixelRatio ||
-        canvas.backingStorePixelRatio || 1;
 
-    dim.ratio = devicePixelRatio / backingStoreRatio;
+    dim.ratio = window.devicePixelRatio || 1;
     dim.w = window.innerWidth;
     dim.h = window.innerHeight;
 
+    canvas.style.width = `${dim.w}px`;
+    canvas.style.height = `${dim.h}px`;
+
     canvas.width =  dim.w*dim.ratio;
     canvas.height =  dim.h*dim.ratio;
-    canvas.style.width = dim.w + 'px';
-    canvas.style.height = dim.h + 'px';
+
+    context.scale(dim.ratio,dim.ratio);
 }
 
 window.onload = function() {
-    canvas = document.getElementById("canvas");
+    canvas = document.getElementById('canvas');
     context = canvas.getContext('2d');
 	
 	// Initialize audioContext
@@ -121,6 +121,7 @@ window.onload = function() {
 	// after resize: set circle
 	shape.x = 0.5*dim.w;
 	shape.y = 0.5*dim.h;
+	
 	draw();
     
     window.addEventListener("keypress", doKeyDown, false);
